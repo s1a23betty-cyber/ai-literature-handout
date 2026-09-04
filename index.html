@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AI 輔助臨床問題建構、文獻檢索與篩選學員講義">
+  <title>AI 輔助文獻搜尋｜學員講義</title>
+  <style>
+    :root {
+      --paper: #fcfbf8;
+      --paper-deep: #f1f0eb;
+      --ink: #20221f;
+      --muted: #62645f;
+      --mist-blue: #667b8c;
+      --evidence-green: #4f7863;
+      --note-gold: #b18b4f;
+      --verify-red: #b45f4b;
+      --line: #d9d7d1;
+      --soft-blue: #edf2f4;
+      --soft-green: #edf4ef;
+      --soft-gold: #f7f1e5;
+      --soft-red: #f8edeb;
+      --shadow: 0 18px 50px rgba(41, 49, 46, .08);
+      --body-font: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --display-font: Georgia, "Noto Serif TC", PMingLiU, serif;
+      --mono-font: "Cascadia Mono", Consolas, "Noto Sans Mono CJK TC", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: #e7e8e4;
+      color: var(--ink);
+      font-family: var(--body-font);
+      line-height: 1.78;
+      overflow-wrap: anywhere;
+    }
+    a { color: #355f72; text-underline-offset: .18em; }
+    a:hover { color: var(--verify-red); }
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--note-gold);
+      outline-offset: 3px;
+    }
+    button { font: inherit; }
+
+    .document {
+      width: min(100%, 1180px);
+      margin: 0 auto;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .cover {
+      min-height: 92vh;
+      padding: clamp(42px, 8vw, 96px) clamp(28px, 8vw, 100px);
+      display: grid;
+      align-content: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+    }
+    .cover::before {
+      content: "ASK  →  ACQUIRE  →  APPRAISE  →  APPLY  →  ASSESS";
+      position: absolute;
+      left: clamp(28px, 8vw, 100px);
+      top: 30px;
+      color: var(--mist-blue);
+      font: 700 11px/1 var(--body-font);
+      letter-spacing: .16em;
+    }
+    .cover::after {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto auto;
+      width: 34%;
+      height: 11px;
+      background: linear-gradient(90deg, var(--mist-blue) 0 25%, var(--evidence-green) 25% 50%, var(--note-gold) 50% 75%, var(--verify-red) 75%);
+    }
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--evidence-green);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 { text-wrap: balance; }
+    h1 {
+      max-width: 840px;
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(42px, 7vw, 78px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+    .subtitle {
+      max-width: 760px;
+      margin: 24px 0 0;
+      color: #42575f;
+      font-size: clamp(20px, 3vw, 31px);
+      line-height: 1.45;
+    }
+    .cover-thesis {
+      max-width: 760px;
+      margin: 36px 0 0;
+      padding: 18px 22px;
+      border-left: 5px solid var(--evidence-green);
+      background: var(--soft-green);
+      font-size: 17px;
+    }
+    .cover-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 24px;
+      margin-top: 30px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .rights {
+      max-width: 860px;
+      margin-top: 42px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.75;
+    }
+    .rights strong { color: var(--ink); }
+
+    .toc {
+      padding: 52px clamp(24px, 7vw, 84px) 58px;
+      background: var(--paper-deep);
+      border-bottom: 1px solid var(--line);
+    }
+    .toc h2 {
+      margin: 0 0 24px;
+      font-family: var(--display-font);
+      font-size: 34px;
+    }
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 30px;
+      counter-reset: toc;
+    }
+    .toc li { counter-increment: toc; }
+    .toc a {
+      display: grid;
+      grid-template-columns: 2.1em 1fr;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      color: var(--verify-red);
+      font: 700 12px/1.8 var(--mono-font);
+    }
+
+    .reader-grid {
+      display: grid;
+      grid-template-columns: 176px minmax(0, 1fr);
+      align-items: start;
+    }
+    .route {
+      position: sticky;
+      top: 0;
+      max-height: 100vh;
+      padding: 34px 20px 34px 30px;
+      overflow: auto;
+      border-right: 1px solid var(--line);
+      background: rgba(252, 251, 248, .96);
+    }
+    .route-title {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .14em;
+    }
+    .route a {
+      display: block;
+      position: relative;
+      padding: 8px 0 8px 18px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+      text-decoration: none;
+      border-left: 1px solid var(--line);
+    }
+    .route a::before {
+      content: "";
+      position: absolute;
+      left: -4px;
+      top: 13px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--mist-blue);
+    }
+    .route a:hover { color: var(--ink); }
+    .content { min-width: 0; }
+    .chapter {
+      padding: 70px clamp(28px, 6vw, 76px) 78px;
+      border-bottom: 1px solid var(--line);
+      scroll-margin-top: 12px;
+    }
+    .chapter:last-child { border-bottom: 0; }
+    .chapter-head {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 34px;
+    }
+    .chapter-no {
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      color: var(--mist-blue);
+      font: 700 18px/1 var(--mono-font);
+    }
+    .chapter-kicker {
+      margin: 0 0 5px;
+      color: var(--evidence-green);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .chapter h2 {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.18;
+      letter-spacing: -.025em;
+    }
+    .chapter h3 {
+      margin: 36px 0 12px;
+      color: #314d58;
+      font-size: 21px;
+      line-height: 1.35;
+    }
+    .lead {
+      margin: 0 0 28px;
+      color: #3c504f;
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    p { margin: 0 0 1em; }
+    ul, ol { padding-left: 1.4em; }
+    li + li { margin-top: .45em; }
+
+    .takeaway,
+    .verify,
+    .note,
+    .case-box {
+      margin: 24px 0;
+      padding: 20px 22px;
+      border-left: 5px solid;
+      break-inside: avoid;
+    }
+    .takeaway { border-color: var(--evidence-green); background: var(--soft-green); }
+    .verify { border-color: var(--verify-red); background: var(--soft-red); }
+    .note { border-color: var(--note-gold); background: var(--soft-gold); }
+    .case-box { border-color: var(--mist-blue); background: var(--soft-blue); }
+    .takeaway strong,
+    .verify strong,
+    .note strong,
+    .case-box strong { display: block; margin-bottom: 4px; }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+      margin: 22px 0;
+    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      background: #fff;
+      break-inside: avoid;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 18px; }
+    .card p:last-child { margin-bottom: 0; }
+    .mini-label {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: var(--verify-red);
+      font: 800 10px/1 var(--body-font);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .table-wrap { margin: 20px 0 28px; overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--paper-deep); color: #304a52; }
+    tbody tr:nth-child(even) { background: rgba(241, 240, 235, .45); }
+
+    .search-string,
+    .method-copy {
+      margin: 18px 0;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      background: #f4f6f5;
+      font-family: var(--mono-font);
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .link-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 16px;
+      margin: 20px 0;
+    }
+    .link-list a {
+      display: block;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .link-list a::after { content: " ↗"; color: var(--verify-red); }
+
+    .prompt-card {
+      margin: 30px 0;
+      border: 1px solid #cfd5d1;
+      background: #fff;
+      box-shadow: 0 8px 28px rgba(44, 58, 52, .06);
+      break-inside: avoid;
+    }
+    .prompt-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 18px 20px;
+      background: var(--soft-green);
+      border-bottom: 1px solid #cfd5d1;
+    }
+    .prompt-head h3 { margin: 0; color: #294a3c; font-size: 20px; }
+    .prompt-body { padding: 20px; }
+    .prompt-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 22px;
+      margin-bottom: 18px;
+      font-size: 13px;
+    }
+    .prompt-meta strong { display: block; color: #3b6651; }
+    .prompt-text {
+      margin: 0;
+      padding: 18px 20px;
+      border-left: 4px solid var(--evidence-green);
+      background: #f5f7f5;
+      font-family: var(--mono-font);
+      font-size: 13px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      tab-size: 2;
+    }
+    .prompt-check {
+      margin: 16px 0 0;
+      padding-top: 14px;
+      border-top: 1px dashed var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .copy-button {
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 15px;
+      background: var(--evidence-green);
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .copy-button:hover { background: #365e4a; }
+    .copy-button[data-state="copied"] { background: var(--mist-blue); }
+    .copy-button[data-state="failed"] { background: var(--verify-red); }
+
+    .document-footer {
+      padding: 34px clamp(24px, 7vw, 84px);
+      color: var(--muted);
+      background: var(--paper-deep);
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+    }
+    .footer-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px 28px;
+    }
+    .back-top {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 860px) {
+      .reader-grid { display: block; }
+      .route { display: none; }
+      .toc ol, .grid-3 { grid-template-columns: 1fr; }
+      .grid-2, .prompt-meta { grid-template-columns: 1fr; }
+      .cover { min-height: auto; padding-top: 90px; }
+    }
+    @media (max-width: 560px) {
+      .chapter { padding: 52px 20px 60px; }
+      .chapter-head { grid-template-columns: 50px minmax(0, 1fr); gap: 12px; }
+      .chapter-no { width: 46px; height: 46px; font-size: 14px; }
+      .prompt-head { display: block; }
+      .copy-button { margin-top: 12px; width: 100%; }
+      th, td { padding: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    @page { size: A4; margin: 16mm 17mm 18mm; }
+    @media print {
+      body { background: #fff; font-size: 11pt; line-height: 1.55; }
+      .document { width: auto; box-shadow: none; }
+      .cover { min-height: 0; padding: 22mm 4mm 16mm; page-break-after: always; }
+      .cover::before, .cover::after { display: none; }
+      .toc { padding: 0; background: #fff; page-break-after: always; }
+      .toc ol { grid-template-columns: 1fr; }
+      .reader-grid { display: block; }
+      .route, .back-top, .copy-button { display: none !important; }
+      .chapter { padding: 0; border: 0; page-break-before: always; }
+      .chapter-head { margin-bottom: 8mm; }
+      .chapter h2 { font-size: 25pt; }
+      .chapter h3 { break-after: avoid; page-break-after: avoid; }
+      .card, .prompt-card, .takeaway, .verify, .note, .case-box { break-inside: avoid; }
+      .prompt-card { box-shadow: none; }
+      .prompt-text { font-size: 9pt; }
+      .table-wrap { overflow: visible; }
+      table { font-size: 9pt; }
+      a { color: inherit; text-decoration: none; }
+      .document-footer { padding: 10mm 0 0; background: #fff; }
+    }
+  </style>
+</head>
+<body id="top">
+  <article class="document">
+    <header class="cover">
+      <p class="eyebrow">台灣實證護理學會 · 2026 AI 輔助實證護理工作坊</p>
+      <h1>AI協作小精靈～<br>多元AI助手文獻實戰</h1>
+      <p class="subtitle">AI 輔助臨床問題建構、文獻檢索與篩選｜學員版複習講義</p>
+      <p class="cover-thesis"><strong>重點不是記住每個網站，而是走完可查核的證據流程。</strong>先辨認任務，再選工具；AI 加速，人保留最後決定。</p>
+      <div class="cover-meta">
+        <span>講義編製：梁巧儒 護理師</span>
+        <span>臺北榮民總醫院</span>
+        <span>授課日期：2026-09-05</span>
+      </div>
+      <div class="rights">
+        <strong>© 2026 梁巧儒。保留所有權利。</strong><br>
+        本講義僅供「AI協作小精靈～多元AI助手文獻實戰」課程學員個人學習、臨床實證練習及非營利研究使用。講義中的 Prompt 可供學員複製、調整並應用於個人學習或工作情境。<br>
+        未經編製者書面同意，不得將整份講義或 Prompt 合集重製、公開傳輸、散布、改作、轉售，或用於其他課程與商業用途。講義引用之外部網站、工具、商標及資料，其權利歸原權利人所有。
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="講義目錄">
+      <h2>目錄</h2>
+      <ol>
+        <li><a href="#course-use">課程核心觀念與講義使用方式</a></li>
+        <li><a href="#workflow">5A 流程與人工查核原則</a></li>
+        <li><a href="#picos">從臨床觀察建立 PICOS</a></li>
+        <li><a href="#mesh">從 PICOS 建立 MeSH 與自由詞</a></li>
+        <li><a href="#pubmed">建立並實測 PubMed Search Strategy</a></li>
+        <li><a href="#connector">Connector 與 PubMed 官網核對</a></li>
+        <li><a href="#tools">核心工具、支援工具與延伸資料</a></li>
+        <li><a href="#screening">篩選、全文閱讀與資料彙整</a></li>
+        <li><a href="#reporting">PRISMA、方法揭露與 Agent</a></li>
+        <li><a href="#resources">工具入口與延伸學習資源</a></li>
+        <li><a href="#prompt-toolbox">完整 Prompt 工具箱</a></li>
+      </ol>
+    </nav>
+
+    <div class="reader-grid">
+      <aside class="route" aria-label="證據路徑快速導覽">
+        <p class="route-title">EVIDENCE ROUTE</p>
+        <a href="#course-use">Start｜先理解界線</a>
+        <a href="#workflow">5A｜定位任務</a>
+        <a href="#picos">Ask｜建立 PICOS</a>
+        <a href="#mesh">Terms｜核對詞彙</a>
+        <a href="#pubmed">Search｜實測策略</a>
+        <a href="#connector">Verify｜回官網核對</a>
+        <a href="#tools">Explore｜選對工具</a>
+        <a href="#screening">Screen｜保留理由</a>
+        <a href="#reporting">Report｜透明揭露</a>
+        <a href="#resources">Extend｜延伸資源</a>
+        <a href="#prompt-toolbox">Reuse｜複製 Prompt</a>
+      </aside>
+
+      <main class="content">
+        <section class="chapter" id="course-use">
+          <header class="chapter-head">
+            <div class="chapter-no">01</div>
+            <div><p class="chapter-kicker">Start · why this matters</p><h2>課程核心觀念與講義使用方式</h2></div>
+          </header>
+          <p class="lead">AI 找得快，不代表找得完整。你真正要帶走的不是某個工具的按鈕位置，而是能被記錄、測試、回查與說明的工作方法。</p>
+
+          <div class="note">
+            <strong>速度不能代替完整性</strong>
+            Lau 與 Golder（2025）以四個證據綜整案例比較研究中使用的 Elicit Pro Review mode 與原始回顧的傳統搜尋：平均 sensitivity 分別為 39.5% 與 94.5%。這只代表該研究設定與工具版本，不能概括所有 AI 工具；它提醒我們評估的是遺漏相關研究的風險，而不只是操作速度。<br>
+            <a href="https://doi.org/10.1002/cesm.70050" target="_blank" rel="noopener noreferrer">閱讀原始研究</a>
+          </div>
+
+          <div class="grid-2">
+            <article class="card">
+              <span class="mini-label">AI 可以協助</span>
+              <ul>
+                <li>整理 PICOS 候選與待確認問題。</li>
+                <li>擴充關鍵字、MeSH 候選與檢索式初稿。</li>
+                <li>搜尋、排序、摘要與關聯文獻探索。</li>
+                <li>依標準做題名摘要初篩並留下理由。</li>
+              </ul>
+            </article>
+            <article class="card">
+              <span class="mini-label">研究者必須負責</span>
+              <ul>
+                <li>確認研究問題、納排標準與範圍。</li>
+                <li>核對 MeSH、資料庫、檢索式與結果數。</li>
+                <li>回到原始文獻查核書目、研究設計與結果。</li>
+                <li>作成最終納入／排除決定並揭露 AI 用法。</li>
+              </ul>
+            </article>
+          </div>
+
+          <h3>使用這份講義的方式</h3>
+          <ol>
+            <li>先用目錄找到目前的任務，不必從第一頁讀到最後。</li>
+            <li>依章節完成「人先決定」與「AI 可協助」的分工。</li>
+            <li>到最後一章複製 Prompt，替換括號內資訊後再送出。</li>
+            <li>保存工具、版本／方案、使用日期、資料來源、Prompt 與人工修訂紀錄。</li>
+          </ol>
+          <div class="takeaway"><strong>核心句</strong>AI 可以協助發現與整理文獻；證據仍來自原始研究，最終決策仍由研究者負責。</div>
+        </section>
+
+        <section class="chapter" id="workflow">
+          <header class="chapter-head">
+            <div class="chapter-no">02</div>
+            <div><p class="chapter-kicker">5A · task before tool</p><h2>5A 流程與人工查核原則</h2></div>
+          </header>
+          <p class="lead">選工具前先問：我現在位於 5A 的哪一階段？我要的輸出是候選問題、可重現檢索、文獻關係、全文定位，還是來源限定比較？</p>
+          <div class="takeaway"><strong>完整證據路徑</strong>問清楚 → 找方向 → 正式找全 → 篩選整理 → 閱讀核對。Prompt 是各步驟共用的操作語言；資料庫與人工決策是可重現主幹。</div>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>5A 階段</th><th>目前任務</th><th>本課優先工具</th><th>人工查核點</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Ask</strong></td><td>聚焦問題、理解臨床脈絡</td><td>OpenEvidence；通用 LLM</td><td>定義 PICOS、回原始指引與研究</td></tr>
+                <tr><td><strong>Acquire</strong></td><td>搜尋、發現與延伸文獻</td><td>PubMed／Connector、Consensus、Elicit、Connected Papers</td><td>回 DOI／PMID、資料庫與全文核對</td></tr>
+                <tr><td><strong>Appraise</strong></td><td>定位原文、整理研究欄位</td><td>SciSpace；Elicit 輔助整理</td><td>核對支持句、效果值、時間點與分母</td></tr>
+                <tr><td><strong>Apply</strong></td><td>依已選來源做整合與應用</td><td>Gemini Notebook</td><td>確認來源適切性並逐格點回引用</td></tr>
+                <tr><td><strong>Assess</strong></td><td>評估成效、偏差與可重現性</td><td>研究者主導；AI 協助整理</td><td>保留版本、紀錄與人類決策</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>固定使用的三個判斷句</h3>
+          <div class="grid-3">
+            <article class="card"><span class="mini-label">Task</span><p>我要解決的是哪一個任務？</p></article>
+            <article class="card"><span class="mini-label">Trace</span><p>工具的資料來源與輸出能否查核？</p></article>
+            <article class="card"><span class="mini-label">Human</span><p>最後哪一步必須由人做決定？</p></article>
+          </div>
+          <p>通用 LLM（例如 Claude、ChatGPT、Gemini）可橫跨 5A 協助表述、改寫與結構化，但不等於專用資料庫或系統性檢索平台。同一工具也可能跨越多個階段；本講義標示的是課程優先用法，而非產品完整功能表。</p>
+          <div class="verify"><strong>不要把產品功能與 EBP 流程混在一起</strong>資料庫仍是可記錄、可測試、可重現的主幹；AI 工具只加速其中的特定任務。</div>
+        </section>
+
+        <section class="chapter" id="picos">
+          <header class="chapter-head">
+            <div class="chapter-no">03</div>
+            <div><p class="chapter-kicker">Ask · define before searching</p><h2>從臨床觀察建立 PICOS</h2></div>
+          </header>
+          <p class="lead">先讓 AI 提出候選與追問，不讓它替你把研究範圍定案。每一欄都要區分已知資訊、合理候選與待確認事項。</p>
+          <div class="case-box">
+            <strong>共同案例</strong>
+            成年 ICU 病人常因重症狀態、睡眠中斷與環境改變發生譫妄。團隊想知道：家屬參與照護或較彈性的探視方式，是否能降低住院期間譫妄？
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>元素</th><th>本案例候選</th><th>需要再確認</th></tr></thead>
+              <tbody>
+                <tr><td><strong>P</strong></td><td>成年 ICU 病人</td><td>ICU 類型、年齡界線、特殊族群</td></tr>
+                <tr><td><strong>I</strong></td><td>家屬參與照護／彈性探視</td><td>兩者是否合併、介入強度與內容</td></tr>
+                <tr><td><strong>C</strong></td><td>常規照護、標準或限制探視</td><td>比較組定義是否需要收窄</td></tr>
+                <tr><td><strong>O</strong></td><td>譫妄發生率；次要可看持續時間、嚴重度或無譫妄天數</td><td>主要與次要結果的優先順序</td></tr>
+                <tr><td><strong>S</strong></td><td>優先 RCT</td><td>主檢索式先不加設計限制，搜尋後再篩</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>為什麼 C 與 O 不一定放進主檢索式？</h3>
+          <p>比較組在題名與摘要中可能沒有被清楚描述；結果用詞與索引方式也較多元。過早把 C 或 O 放入主檢索式，可能讓策略太窄。先用核心概念搜尋，再於篩選階段判斷，通常較能降低漏失風險。</p>
+
+          <h3>好的 Prompt 要交代五件事</h3>
+          <div class="grid-3">
+            <article class="card"><strong>背景</strong><p>角色、臨床情境、已有資料。</p></article>
+            <article class="card"><strong>任務</strong><p>只交付目前這一步。</p></article>
+            <article class="card"><strong>限制</strong><p>來源、範圍與禁止猜測。</p></article>
+            <article class="card"><strong>輸出</strong><p>表格欄位、理由與引用。</p></article>
+            <article class="card"><strong>不確定性</strong><p>資料不足寫待確認。</p></article>
+          </div>
+          <p>完整可複製版本請見 <a href="#prompt-1">Prompt 1｜臨床觀察 → PICOS</a>。</p>
+        </section>
+
+        <section class="chapter" id="mesh">
+          <header class="chapter-head">
+            <div class="chapter-no">04</div>
+            <div><p class="chapter-kicker">Terms · candidate is not confirmed</p><h2>從 PICOS 建立 MeSH 與自由詞</h2></div>
+          </header>
+          <p class="lead">MeSH 不是靠 AI 猜答案。AI 可以產生候選詞，但正式 Heading、Scope Note 與 Entry Terms 都要回 NLM MeSH Browser 核對。</p>
+
+          <div class="grid-2">
+            <article class="card">
+              <span class="mini-label">Prompt 要約束 AI</span>
+              <ul>
+                <li>一個概念一列，MeSH 與自由詞分開。</li>
+                <li>所有 MeSH 標示「候選／待核對」。</li>
+                <li>不要捏造 Scope Note、Entry Terms、結果數或文獻。</li>
+                <li>可能歧義的詞另列，不直接放入正式策略。</li>
+              </ul>
+            </article>
+            <article class="card">
+              <span class="mini-label">官方核對四項</span>
+              <ol>
+                <li>正式 Heading 是否存在。</li>
+                <li>Scope Note 是否符合研究語意。</li>
+                <li>Entry Terms 能補哪些自由詞。</li>
+                <li>最後決定採用、修正或不用。</li>
+              </ol>
+            </article>
+          </div>
+
+          <h3>本案例的三個主要概念塊</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>概念</th><th>MeSH 候選</th><th>自由詞候選</th><th>查核提醒</th></tr></thead>
+              <tbody>
+                <tr><td>ICU</td><td>Intensive Care Units</td><td>intensive care unit、ICU、critical care</td><td>核對 Heading 與複數形式</td></tr>
+                <tr><td>家屬參與／探視</td><td>Family</td><td>family participation、family involvement、family engagement、family-centered care、flexible visitation、family visitation</td><td>Family 是否足以代表介入，需看 Scope Note 與搜尋結果</td></tr>
+                <tr><td>譫妄</td><td>Delirium</td><td>delirium、ICU delirium</td><td>確認結果詞是否讓策略過窄</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="verify"><strong>「有這個 MeSH」不等於「適合這個問題」</strong>先看 Scope Note，再決定是否放進檢索式。</div>
+          <p><a href="https://meshb.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">開啟 NLM MeSH Browser</a>｜完整可複製版本請見 <a href="#prompt-2">Prompt 2｜PICOS → 關鍵字與 MeSH 候選</a>。</p>
+        </section>
+
+        <section class="chapter" id="pubmed">
+          <header class="chapter-head">
+            <div class="chapter-no">05</div>
+            <div><p class="chapter-kicker">Search · build, test, diagnose</p><h2>建立並實測 PubMed Search Strategy</h2></div>
+          </header>
+          <p class="lead">同義詞用 OR 串接，概念塊用 AND 組合。真正重要的不是 AI 產出一條看似完整的字串，而是你能逐塊測試、記錄結果並診斷漏失。</p>
+
+          <pre class="search-string">("Intensive Care Units"[Mesh] OR "intensive care"[tiab] OR ICU[tiab] OR "critical care"[tiab])
+AND
+("Family"[Mesh] OR "family participation"[tiab] OR "family involvement"[tiab] OR "family engagement"[tiab] OR "family-centered care"[tiab] OR "flexible visitation"[tiab] OR "family visitation"[tiab])
+AND
+("Delirium"[Mesh] OR delirium[tiab] OR "ICU delirium"[tiab])</pre>
+
+          <div class="grid-2">
+            <article class="card"><h3>1｜指定資料庫</h3><p>本堂示範 PubMed。換到 CINAHL、Embase 或 Cochrane Library 時，主題詞、欄位代碼、截詞與語法都需重寫。</p></article>
+            <article class="card"><h3>2｜核對語法</h3><p>檢查欄位標籤、引號、括號與 AND／OR 是否正確。</p></article>
+            <article class="card"><h3>3｜核對結果</h3><p>記錄執行日期與結果數，確認已知種子文獻是否出現。</p></article>
+            <article class="card"><h3>4｜診斷漏失</h3><p>找不到已知文獻時，從三塊退回兩塊、單塊，定位過窄概念。</p></article>
+          </div>
+
+          <h3>逐步測試順序</h3>
+          <ol>
+            <li>分別執行 ICU、家屬參與／探視、譫妄三個單一概念塊。</li>
+            <li>測試 ICU AND 家屬參與／探視。</li>
+            <li>再加入譫妄概念塊。</li>
+            <li>找不到已知種子文獻時，逐塊移除並檢查題名摘要實際用詞。</li>
+            <li>日期、語言、Humans 或研究設計限制留到策略穩定後再測。</li>
+          </ol>
+          <div class="note"><strong>日期限制用介面操作較不易出錯</strong>年限可在 PubMed 左側 Publication date 勾選 1／5／10 years，或使用 Custom range；不必每次重打整條檢索式。</div>
+          <p><a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">開啟 PubMed</a>｜完整可複製版本請見 <a href="#prompt-3">Prompt 3｜建立可實測的 PubMed 檢索式</a>。</p>
+        </section>
+
+        <section class="chapter" id="connector">
+          <header class="chapter-head">
+            <div class="chapter-no">06</div>
+            <div><p class="chapter-kicker">Verify · connector is not the database UI</p><h2>Connector 與 PubMed 官網核對</h2></div>
+          </header>
+          <p class="lead">Claude 的 PubMed Connector 能把檢索真正送到 PubMed 並回傳 PMID，但它是加速前期探勘的入口，不取代 PubMed 官網的完整介面與正式搜尋紀錄。</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>層次</th><th>作用</th><th>本課怎麼用</th></tr></thead>
+              <tbody>
+                <tr><td><strong>網站／資料庫介面</strong></td><td>完整欄位、filters、歷史紀錄與匯出</td><td>PubMed 官網負責正式實測與保存</td></tr>
+                <tr><td><strong>Connector</strong></td><td>在 AI 對話中呼叫外部服務</td><td>快速執行並帶回候選與 PMID，再回官網核對</td></tr>
+                <tr><td><strong>MCP</strong></td><td>讓 AI 連接工具與資料的標準協定</td><td>是連接方式，不是資料庫，也不保證搜尋完整性</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>確認 Connector 真的被呼叫</h3>
+          <ol>
+            <li>在 Claude 輸入框附近開啟 Connectors，加入並開啟 PubMed。</li>
+            <li>送出清楚的資料庫任務，要求保留 search strategy 與 PMID。</li>
+            <li>回答過程應出現工具呼叫區塊；展開後核對實際 query 與回傳 PMID。</li>
+            <li>沒有工具呼叫區塊時，不要把模型生成的回答當成資料庫結果。</li>
+          </ol>
+
+          <div class="grid-2">
+            <article class="card"><h3>查詢有複雜度上限</h3><p>字串太長、同義詞太多或布林結構太複雜時，連接器可能拒絕、簡化或重新解析。</p></article>
+            <article class="card"><h3>功能不是完整介面</h3><p>缺少完整 filters、排序、My NCBI 與 RIS／EndNote 匯出能力。</p></article>
+            <article class="card"><h3>字串可能被重新轉譯</h3><p>連接器解析後送出的 query 可能與你貼入官網的字串不同，必須展開工具區塊核對。</p></article>
+            <article class="card"><h3>筆數可能截斷</h3><p>單次回傳有上限，重跑也未必完全一致；正式結果以官網為準。</p></article>
+          </div>
+
+          <h3>核對流程</h3>
+          <p>把 Connector 實際送出的 query 複製到 PubMed 官網，記錄執行日期、完整策略、官網結果數與已知種子文獻是否出現。本案例可用 Rosa et al.（2019）作為已知文獻：<a href="https://pubmed.ncbi.nlm.nih.gov/31310297/" target="_blank" rel="noopener noreferrer">PMID 31310297</a>，DOI 10.1001/jama.2019.8766。</p>
+          <div class="verify"><strong>正式原則</strong>AI 端做前期探勘；正式檢索回資料庫官網重跑，保存完整查詢式、執行日期、結果數與匯出檔；截圖僅作輔助。</div>
+          <p>可複製的 Connector 任務與官網檢索字串收在 <a href="#connector-task">Prompt 工具箱</a>。</p>
+        </section>
+
+        <section class="chapter" id="tools">
+          <header class="chapter-head">
+            <div class="chapter-no">07</div>
+            <div><p class="chapter-kicker">Explore · different tools answer different questions</p><h2>核心工具、支援工具與延伸資料</h2></div>
+          </header>
+          <p class="lead">工具不是平行的網站清單。核心工具承接課堂主流程，支援工具補 citation chasing 與來源限定整理；Asta 因時間因素移至 Bonus 延伸。</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>工具</th><th>本課主要任務</th><th>適合帶回家的用法</th><th>人工查核提醒</th></tr></thead>
+              <tbody>
+                <tr><td><a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer"><strong>OpenEvidence</strong></a></td><td>Ask：醫療版 AI 搜尋引擎＋evidence synthesis</td><td>把偏寬問題問清楚，追到 guideline 與原始證據入口</td><td>核對組織、年份、族群與原文；不等於完整系統性搜尋</td></tr>
+                <tr><td><a href="https://consensus.app/" target="_blank" rel="noopener noreferrer"><strong>Consensus</strong></a></td><td>Acquire：自然語言快速掃描</td><td>理解研究方向、取得候選 papers 與引用</td><td>摘要、Meter 與 Graph 都是探索入口；回 DOI／PMID／全文</td></tr>
+                <tr><td><a href="https://elicit.com/" target="_blank" rel="noopener noreferrer"><strong>Elicit</strong></a></td><td>Acquire／Appraise：語意搜尋與欄位化</td><td>確認核心研究、補充候選、比較欄位</td><td>欄位空白不等於不符合；screening 與 extraction 回支持句核對</td></tr>
+                <tr><td><a href="https://www.connectedpapers.com/" target="_blank" rel="noopener noreferrer"><strong>Connected Papers</strong></a></td><td>Acquire：從可靠種子文獻延伸</td><td>探索 Similar、Prior、Derivative works</td><td>相似性圖譜不是完整 citation tree，也不等於系統性檢索</td></tr>
+                <tr><td><a href="https://scispace.com/" target="_blank" rel="noopener noreferrer"><strong>SciSpace</strong></a></td><td>Appraise：Chat with PDF</td><td>在指定全文定位方法、結果與支持段落</td><td>生成表格不是正式資料萃取；核對頁碼、單位、時間點與分母</td></tr>
+                <tr><td><a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer"><strong>Gemini Notebook</strong></a></td><td>Apply：來源限定跨文件比較</td><td>只依已選 PDF／文件建立比較表</td><td>先確認上傳來源適切，再逐格點回 inline citations</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>四種「找文獻」方式回答不同問題</h3>
+          <div class="grid-2">
+            <article class="card"><span class="mini-label">可重現檢索</span><h3>PubMed／Connector</h3><p>依明確策略找出哪些紀錄？正式 Acquire 主幹仍是資料庫。</p></article>
+            <article class="card"><span class="mini-label">語意相關性</span><h3>Elicit</h3><p>哪些研究和我的問題語意最接近？適合找核心文章與補充候選。</p></article>
+            <article class="card"><span class="mini-label">文獻關係</span><h3>Connected Papers</h3><p>從可靠 seed 往相似、先前與後續研究怎麼走？屬於 citation chasing／other methods。</p></article>
+            <article class="card"><span class="mini-label">快速理解</span><h3>Consensus</h3><p>研究大方向與候選證據是什麼？用來掃描並形成下一步追問。</p></article>
+          </div>
+          <div class="takeaway"><strong>整合句</strong>不是誰取代誰，而是「可重現資料庫檢索」加上「AI 探勘／延伸」；所有候選文獻最後都回 DOI／PMID／原文核對。</div>
+          <p class="note"><strong>功能核對日期</strong>本章依主簡報於 2026-08-30 整理的官方功能地圖重整；介面、方案與功能可能持續更新，實際使用前請再查看官方說明。</p>
+        </section>
+
+        <section class="chapter" id="screening">
+          <header class="chapter-head">
+            <div class="chapter-no">08</div>
+            <div><p class="chapter-kicker">Screen · evidence for every decision</p><h2>篩選、全文閱讀與資料彙整</h2></div>
+          </header>
+          <p class="lead">AI 初篩最重要的不是「替你選完」，而是逐筆保留 P／I／C／O／S 判斷、單一主要理由與支持原文，讓研究者能抽查、處理衝突與重新判定。</p>
+
+          <div class="grid-3">
+            <article class="card"><span class="mini-label">納入</span><p>摘要可支持主要條件；仍需全文確認。</p></article>
+            <article class="card"><span class="mini-label">待確認</span><p>資料不足、語意含糊或需全文判斷；不能因沒寫就排除。</p></article>
+            <article class="card"><span class="mini-label">排除</span><p>至少一項納入條件明確不符，並寫出單一主要理由。</p></article>
+          </div>
+
+          <h3>AI 初篩後，人要查三層</h3>
+          <ol>
+            <li><strong>書目身分：</strong>題名、作者、年份、期刊、PMID／DOI 是否一致；是否為重複紀錄。</li>
+            <li><strong>納排依據：</strong>AI 的理由是否真的出現在題名或摘要；「沒提到」不等於「不符合」。</li>
+            <li><strong>研究設計與全文：</strong>protocol、review、RCT、觀察性研究要分清，必要時回全文。</li>
+          </ol>
+
+          <div class="verify"><strong>三種高風險情況</strong>工具沒有檢索到的研究不會進入後續人工視野；錯誤排除需要靠保留完整紀錄與理由補救；引用／摘要錯配必須以 DOI／PMID 回原始頁確認。</div>
+
+          <h3>全文閱讀：AI 先定位，人再核對</h3>
+          <div class="grid-2">
+            <article class="card"><h3>單篇 PDF｜SciSpace</h3><p>指定欄位與問題，要求每一點附頁碼、段落或支持句；沒有報告就寫「未報告」。</p></article>
+            <article class="card"><h3>多篇已選來源｜Gemini Notebook</h3><p>限定只依上傳來源建立比較表；每一格附來源，不加入外部知識。</p></article>
+          </div>
+          <p>建議欄位包括：研究設計、場域、樣本與特徵、PICOS、介入細節、比較組、結局與時間點、效果估計、95% CI／p 值、不良事件、作者陳述的限制，以及每一項的原文位置。</p>
+          <div class="takeaway"><strong>摘要不是全文</strong>AI 產生的結構化表格也不等於資料萃取完成。每個效果值、單位、時間點與分母都要回原文。</div>
+          <p>可複製版本請見 <a href="#prompt-4">Prompt 4｜題名摘要初篩</a> 與 <a href="#prompt-5">Prompt 5｜全文閱讀與資料彙整</a>。</p>
+        </section>
+
+        <section class="chapter" id="reporting">
+          <header class="chapter-head">
+            <div class="chapter-no">09</div>
+            <div><p class="chapter-kicker">Report · make human and AI roles visible</p><h2>PRISMA、方法揭露與 Agent</h2></div>
+          </header>
+          <p class="lead">AI 用在哪一步，會影響 PRISMA 的紀錄位置與 Methods 的寫法。先判斷紀錄從哪裡來、誰作最後決定，再決定如何報告。</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>AI 使用方式</th><th>PRISMA 紀錄原則</th><th>必須保存</th></tr></thead>
+              <tbody>
+                <tr><td>AI 協助建立檢索式，實際在資料庫執行</td><td>紀錄仍放在實際搜尋的資料庫；AI 用法寫入 Methods</td><td>資料庫、策略、日期、結果數、工具與人工修訂</td></tr>
+                <tr><td>AI 工具直接找文獻或追蹤引文</td><td>依實際來源列於 websites、organizations、citation searching 或 other methods</td><td>工具、種子文獻、日期、找到的紀錄數與去重方式</td></tr>
+                <tr><td>工具在人工篩選前直接排除</td><td>可列為 records marked as ineligible by automation tools</td><td>門檻、排除數、抽查與風險控制</td></tr>
+                <tr><td>AI 排序或初判，研究者確認</td><td>記入一般 screening／exclusion 流程</td><td>人工複核方式、衝突與最終決策</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>PRISMA-trAIce 的位置</h3>
+          <p>PRISMA 2020 已要求報告自動化；PRISMA-trAIce 進一步將人與 AI 的處理量、決定與理由拆成獨立欄位，並區分規則型行政工具與做納排判斷的評價型 AI。它是經同儕審查發表的基礎提案，但不是 PRISMA 官方擴充指引，投稿仍需以目標期刊規定為準。</p>
+
+          <h3>Methods 揭露範本</h3>
+          <pre class="method-copy">本研究於〔實際階段〕使用〔工具名稱／版本或方案〕（使用日期：〔YYYY-MM-DD〕），用途為〔具體任務〕；提示詞見〔附錄／補充資料〕。
+工具輸出由〔實際人數與複核方式〕查核；歧異以〔實際處理方式〕解決。最終納入與排除決定由研究者作成。</pre>
+          <p>揭露至少包含：工具、版本／方案、使用日期、實際用途、Prompt 保存位置、人工複核人數、複核方式與衝突處理。</p>
+
+          <h3>任務型 AI Agent：串接，但不越權</h3>
+          <ol>
+            <li><strong>輸入 PICOS：</strong>人先定義問題與核心檢索概念。</li>
+            <li><strong>產生候選詞：</strong>AI 建議 MeSH、同義詞與 truncation；人核對取捨。</li>
+            <li><strong>多來源搜尋：</strong>從資料庫與學術來源取得候選紀錄。</li>
+            <li><strong>整理與匯出：</strong>去重、題名摘要初判、輸出 CSV／RIS／數字摘要。</li>
+            <li><strong>回到人類篩選：</strong>匯入 Rayyan 等平台，處理盲化篩選、排除理由與 conflicts。</li>
+          </ol>
+          <div class="verify"><strong>較精確的名稱</strong>「任務型 AI Agent」或「人機協作的半自動文獻代理流程」。它不是能自主完成系統性回顧的通用代理。</div>
+          <p><a href="https://www.prisma-statement.org/prisma-2020-flow-diagram" target="_blank" rel="noopener noreferrer">PRISMA 2020 flow diagram</a>｜<a href="https://www.bmj.com/content/372/bmj.n160" target="_blank" rel="noopener noreferrer">PRISMA 2020 Explanation &amp; Elaboration</a>｜<a href="https://rayyan.ai/" target="_blank" rel="noopener noreferrer">Rayyan</a></p>
+        </section>
+
+        <section class="chapter" id="resources">
+          <header class="chapter-head">
+            <div class="chapter-no">10</div>
+            <div><p class="chapter-kicker">Extend · official entry points</p><h2>工具入口與延伸學習資源</h2></div>
+          </header>
+          <p class="lead">先依任務選工具，再回到資料庫、原文與人工決策。工具介面會改版，因此講義保留的是用途、查核點與官方入口。</p>
+
+          <h3>四個核心工具＋支援與流程工具</h3>
+          <div class="link-list">
+            <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer">OpenEvidence｜臨床問題定向</a>
+            <a href="https://consensus.app/" target="_blank" rel="noopener noreferrer">Consensus｜研究快速掃描</a>
+            <a href="https://asta.allen.ai/" target="_blank" rel="noopener noreferrer">Asta｜Bonus 延伸：複雜找文與 citation chasing</a>
+            <a href="https://elicit.com/" target="_blank" rel="noopener noreferrer">Elicit｜語意搜尋與欄位化</a>
+            <a href="https://www.connectedpapers.com/" target="_blank" rel="noopener noreferrer">Connected Papers｜種子文獻延伸</a>
+            <a href="https://scispace.com/" target="_blank" rel="noopener noreferrer">SciSpace｜全文定位</a>
+            <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer">Gemini Notebook｜來源限定彙整</a>
+            <a href="https://claude.ai/" target="_blank" rel="noopener noreferrer">Claude｜流程與 Prompt 協作</a>
+            <a href="https://rayyan.ai/" target="_blank" rel="noopener noreferrer">Rayyan｜協作篩選與衝突處理</a>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed｜正式資料庫實測</a>
+            <a href="https://meshb.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">MeSH Browser｜官方詞彙核對</a>
+            <a href="https://www.prisma-statement.org/prisma-2020-flow-diagram" target="_blank" rel="noopener noreferrer">PRISMA 2020｜流程紀錄</a>
+          </div>
+
+          <h3>官方功能說明</h3>
+          <div class="link-list">
+            <a href="https://www.openevidence.com/user-guide" target="_blank" rel="noopener noreferrer">OpenEvidence User Guide</a>
+            <a href="https://help.consensus.app/en/collections/10600168-explore-features" target="_blank" rel="noopener noreferrer">Consensus Help Center</a>
+            <a href="https://elicit.com/solutions/systematic-review" target="_blank" rel="noopener noreferrer">Elicit Systematic Reviews</a>
+            <a href="https://www.connectedpapers.com/about" target="_blank" rel="noopener noreferrer">Connected Papers About</a>
+            <a href="https://scispace.com/help/en/collections/7177367-literature-review" target="_blank" rel="noopener noreferrer">SciSpace Literature Review Help</a>
+            <a href="https://support.google.com/gemininotebook/?hl=en" target="_blank" rel="noopener noreferrer">Gemini Notebook Help</a>
+            <a href="https://help.rayyan.ai/hc/en-us/articles/45703234075281-How-to-Screen-References-in-Rayyan" target="_blank" rel="noopener noreferrer">Rayyan Screening</a>
+            <a href="https://help.rayyan.ai/hc/en-us/articles/45819983751569-How-to-Use-Ratings-and-Relevance-Ranking-in-Rayyan" target="_blank" rel="noopener noreferrer">Rayyan Relevance Ranking</a>
+          </div>
+
+          <h3>延伸學習</h3>
+          <div class="grid-2">
+            <article class="card"><h3>AI 引用與揭露</h3><p>查閱圖書館整理的引用示例，並在 Methods 說明工具、版本、用途與人工核對。</p><p><a href="https://lib.video.nccu.edu.tw/media/393" target="_blank" rel="noopener noreferrer">政大圖書館</a>｜<a href="https://guides.lib.wayne.edu/c.php?g=1368920&amp;p=10302525" target="_blank" rel="noopener noreferrer">Wayne State</a></p></article>
+            <article class="card"><h3>開源 Pipeline</h3><p>從搜尋、評讀到統計程式碼的開源工作流；使用前核對資料來源、參數與人工驗證點。</p><p><a href="https://github.com/htlin222/meta-pipe" target="_blank" rel="noopener noreferrer">meta-pipe GitHub</a></p></article>
+            <article class="card"><h3>Meta-Mar｜線上統合分析</h3><p>可處理連續型、二元、相關與通用效果量，並提供統合分析圖表、AI 輔助解讀及報告產出。Data Extractor 屬實驗性功能；每個效果值、單位、樣本數與來源段落都要回原文核對。</p><p><a href="https://www.meta-mar.com/" target="_blank" rel="noopener noreferrer">Meta-Mar 官方網站</a></p></article>
+            <article class="card"><h3>批判性評讀資源</h3><p>輸出只能作為初稿，所有判定仍需回到全文直接引文。</p><p><a href="https://reurl.cc/9bdWa8" target="_blank" rel="noopener noreferrer">評讀機器人（入口一）</a>｜<a href="https://reurl.cc/LQv2oa" target="_blank" rel="noopener noreferrer">評讀機器人（入口二）</a></p></article>
+            <article class="card"><h3>自動化篩選方法學</h3><p>區分模型直接排除、排序優先與人工複核，記錄數量、門檻與風險控制。</p><p><a href="https://www.bmj.com/content/372/bmj.n160" target="_blank" rel="noopener noreferrer">PRISMA E&amp;E</a>｜<a href="https://www.nature.com/articles/s42256-020-00287-7" target="_blank" rel="noopener noreferrer">ASReview 研究</a></p></article>
+          </div>
+        </section>
+
+        <section class="chapter" id="prompt-toolbox">
+          <header class="chapter-head">
+            <div class="chapter-no">11</div>
+            <div><p class="chapter-kicker">Reuse · copy, adapt, verify</p><h2>完整 Prompt 工具箱</h2></div>
+          </header>
+          <p class="lead">下列內容可直接複製，再依自己的臨床問題與資料來源調整。複製 Prompt 不等於複製結果：每次仍需保存工具、版本、日期、輸入來源、人工修訂與查核紀錄。</p>
+
+          <article class="prompt-card" data-source-prompt="prompt-tip">
+            <div class="prompt-head"><h3>我的 AI 小 Tips｜資訊不足時先追問</h3><button class="copy-button" type="button" data-copy-target="prompt-tip-text">複製 Prompt</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>尚未確定如何完整描述複雜任務時。</p><p><strong>使用前準備</strong>先說明你目前的目標與已知資訊。</p></div>
+              <pre class="prompt-text" id="prompt-tip-text">若資訊不夠清楚，先用選項式問題向我確認，必要時繼續追問；不要自行假設，確認足夠後再開始。</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>AI 的追問只能協助釐清；研究範圍與最後選項仍由你決定。</p>
+            </div>
+          </article>
+
+          <article class="prompt-card" id="connector-task" data-source-prompt="pmzPrompt">
+            <div class="prompt-head"><h3>Connector 任務｜執行 PubMed 搜尋</h3><button class="copy-button" type="button" data-copy-target="connector-task-text">複製 Prompt</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>已開啟 PubMed Connector，準備執行初步檢索。</p><p><strong>可替換欄位</strong>P、I、O、是否加入研究設計限制、輸出筆數。</p></div>
+              <pre class="prompt-text" id="connector-task-text">依照我的 PICO 建立 PubMed search string，實際執行搜尋，告訴我總共找到幾篇。
+
+P：成年 ICU 病人
+
+I：家屬參與照護或彈性探視
+
+O：譫妄發生率
+
+先不要加入研究設計限制。列出前 10 筆的 PMID、Title、Year，並保留完整可重現的 PubMed search strategy。
+
+請用 MeSH + free-text terms 搜尋；若 MeSH 尚未核對，請明確標示「待官方核對」。</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>展開工具呼叫區塊，比對實際送出的 query 與回傳 PMID；再把策略放回 PubMed 官網實測。</p>
+            </div>
+          </article>
+
+          <article class="prompt-card" data-source-prompt="pmzQuery">
+            <div class="prompt-head"><h3>共同案例｜PubMed 檢索字串</h3><button class="copy-button" type="button" data-copy-target="pubmed-query-text">複製檢索式</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>在 PubMed 官網逐塊實測共同案例。</p><p><strong>可替換欄位</strong>已核對的 MeSH、自由詞與概念塊。</p></div>
+              <pre class="prompt-text" id="pubmed-query-text">("Intensive Care Units"[MeSH Terms] OR "intensive care unit"[tiab] OR ICU[tiab])
+
+AND
+
+("Family"[MeSH Terms] OR "family participation"[tiab] OR "family involvement"[tiab] OR "family engagement"[tiab] OR "family-centered care"[tiab] OR "flexible visitation"[tiab] OR "family visitation"[tiab])
+
+AND
+
+("Delirium"[MeSH Terms] OR delirium[tiab])</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>MeSH Terms、欄位標籤與同義詞需回官方資源確認；記錄官網執行日期與結果數。</p>
+            </div>
+          </article>
+
+          <article class="prompt-card" id="prompt-1" data-source-prompt="ap1">
+            <div class="prompt-head"><h3>Prompt 1｜臨床觀察 → PICOS</h3><button class="copy-button" type="button" data-copy-target="prompt-1-text">複製 Prompt</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>把尚未定案的臨床觀察轉成可討論的 PICOS。</p><p><strong>可替換欄位</strong>臨床族群、介入、情境與預期結果。</p></div>
+              <pre class="prompt-text" id="prompt-1-text">【背景】
+我是臨床護理人員，想探討：成年 ICU 病人接受家屬參與照護或較彈性的探視方式，是否能降低住院期間譫妄。
+
+【任務】
+把臨床問題整理成 PICOS 候選，並協助我辨識研究範圍尚未定案之處。
+
+【限制】
+不要補寫我沒有提供的病人特徵、家屬參與內容、比較組或結果。每一欄標示「已知／合理候選／待確認」。
+
+【輸出】
+1. PICOS 表：定義、目前依據、可能過寬／過窄。
+2. 一句可回答的研究問題。
+3. 最影響研究範圍的 3 個追問。
+
+【不確定性處理】
+資料不足時寫「待確認」，並說明需要我補充什麼；不要自行替我定案。</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>確認 AI 沒有新增你未提供的族群、介入或比較組；逐欄決定哪些候選可採用。</p>
+            </div>
+          </article>
+
+          <article class="prompt-card" id="prompt-2" data-source-prompt="ap2">
+            <div class="prompt-head"><h3>Prompt 2｜PICOS → 關鍵字與 MeSH 候選</h3><button class="copy-button" type="button" data-copy-target="prompt-2-text">複製 Prompt</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>PICOS 已有初步定義，準備建立 PubMed 概念塊。</p><p><strong>可替換欄位</strong>P、I、C、O、S 與優先研究設計。</p></div>
+              <pre class="prompt-text" id="prompt-2-text">【背景】
+已定義：P＝成年 ICU 病人；I＝家屬參與照護或彈性探視；C＝常規照護、標準或限制探視；O＝譫妄發生率，次要可看持續時間、嚴重度或無譫妄天數；S＝優先 RCT。
+
+【任務】
+為 PubMed 建立關鍵字候選表。先判斷哪些 PICOS 元素適合作為主要檢索概念。
+
+【限制】
+MeSH 只能標示為「候選」，提醒我回 MeSH Database 核對；不要虛構 scope note、結果數或文獻。不要自行加入語言、日期或年齡限制。
+
+【輸出】
+每一概念塊列：MeSH 候選｜title/abstract 自由詞｜拼字變體｜truncation｜可能造成漏失或雜訊的詞。最後列建議測試順序。
+
+【不確定性處理】
+不確定是否為官方 MeSH 時，標「需核對」；可能歧義的詞另列，不直接放入正式策略。</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>到 MeSH Browser 核對正式 Heading、Scope Note 與 Entry Terms，再決定採用、修正或不用。</p>
+            </div>
+          </article>
+
+          <article class="prompt-card" id="prompt-3" data-source-prompt="ap3">
+            <div class="prompt-head"><h3>Prompt 3｜建立可實測的 PubMed 檢索式</h3><button class="copy-button" type="button" data-copy-target="prompt-3-text">複製 Prompt</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>MeSH 與自由詞已核對，準備組合正式策略初稿。</p><p><strong>可替換欄位</strong>資料庫、概念塊、欄位代碼與已核對詞彙。</p></div>
+              <pre class="prompt-text" id="prompt-3-text">【背景】
+我要將已核對的 ICU、family involvement／flexible visitation、delirium 三個概念塊組成 PubMed 檢索式初稿。
+
+【任務】
+使用同義詞 OR、概念塊 AND，產出可直接貼入 PubMed 的檢索式，並提出逐步測試方案。
+
+【限制】
+只使用我提供或已標示核對完成的 MeSH 與自由詞；欄位標籤使用 [Mesh] 與 [tiab]。未經同意不要加入 RCT、日期、語言或 Humans filter。不要捏造結果數。
+
+【輸出】
+1. 三個概念塊。
+2. 完整檢索式。
+3. 語法檢查清單。
+4. 從單塊、兩塊到三塊的測試順序。
+5. 若找不到已知種子文獻時的除錯步驟。
+
+【不確定性處理】
+任何尚未核對的詞都在策略下方列為「待核對」，不要混入看似已定案的正式字串。</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>在 PubMed 逐塊執行，記錄結果數並確認已知種子文獻；換資料庫時重新翻譯語法。</p>
+            </div>
+          </article>
+
+          <article class="prompt-card" id="prompt-4" data-source-prompt="ap4">
+            <div class="prompt-head"><h3>Prompt 4｜題名摘要初篩</h3><button class="copy-button" type="button" data-copy-target="prompt-4-text">複製 Prompt</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>已有納排標準與包含題名、摘要、識別碼的紀錄。</p><p><strong>可替換欄位</strong>PICOS、納排標準、資料庫、日期與紀錄內容。</p></div>
+              <pre class="prompt-text" id="prompt-4-text">【背景】
+研究問題與納排標準如下：〔貼上已定案 PICOS 與納排標準〕。以下紀錄來自〔資料庫／工具與日期〕，包含題名、摘要與識別碼。
+
+【任務】
+只依題名與摘要做初篩；逐筆判斷 P／I／C／O／S，並保留可查核理由。
+
+【限制】
+只有至少一項納入條件「明確不符合」時才能排除。摘要沒寫、語意含糊或需要全文才能確認時，一律標「待確認」。不要利用外部記憶補資料。
+
+【輸出】
+表格欄位：紀錄編號｜題名｜P｜I｜C｜O｜S｜總判定（納入／排除／待確認）｜單一主要理由｜支持判斷的摘要原文｜需要人工查核之處。
+
+【不確定性處理】
+缺摘要、引用錯配或識別碼不一致時標「書目待確認」，不得直接排除。最後彙總三類數量。</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>核對書目身分、支持判斷的摘要原文與研究設計；「沒提到」不能當成排除理由。</p>
+            </div>
+          </article>
+
+          <article class="prompt-card" id="prompt-5" data-source-prompt="ap5">
+            <div class="prompt-head"><h3>Prompt 5｜全文閱讀與資料彙整</h3><button class="copy-button" type="button" data-copy-target="prompt-5-text">複製 Prompt</button></div>
+            <div class="prompt-body">
+              <div class="prompt-meta"><p><strong>適用任務</strong>已通過初篩，並能提供合法取得的全文或指定來源。</p><p><strong>可替換欄位</strong>需要萃取的研究欄位、效果指標與來源範圍。</p></div>
+              <pre class="prompt-text" id="prompt-5-text">【背景】
+以下為已通過題名摘要初篩的全文。請只依我提供的 PDF／來源進行資料定位與初步結構化。
+
+【任務】
+萃取並整理：研究設計、場域、樣本數與特徵、PICOS、介入細節、比較組、結局與測量時間點、效果估計值、95% CI／p 值、不良事件、作者陳述的限制。
+
+【限制】
+每一格都附原始頁碼、表格、圖或段落。不得把摘要推論成全文結果，不得換算或合併作者未提供的數值，不得自行判定偏誤風險。
+
+【輸出】
+建立一列一研究的證據表；效果值保留原單位、分母與時間點。另列「需要人工再算／再確認」清單。
+
+【不確定性處理】
+沒有報告寫「未報告」；文字無法判定寫「無法判斷」；數值衝突時同時列出兩處原文位置，不替研究者選一個。</pre>
+              <p class="prompt-check"><strong>人工查核：</strong>逐格回到頁碼、表格、圖或段落；特別核對效果值、單位、分母、時間點與作者限制。</p>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <footer class="document-footer">
+      <div class="footer-row">
+        <span>© 2026 梁巧儒｜限課程學員個人學習使用；請勿整份轉傳、改作、轉售或作為其他課程教材。</span>
+        <span>課程講義｜公開閱讀版</span>
+      </div>
+    </footer>
+  </article>
+
+  <a class="back-top" href="#top" aria-label="返回頁首">↑</a>
+
+  <script>
+    async function copyPrompt(button) {
+      const targetId = button.getAttribute('data-copy-target');
+      const target = document.getElementById(targetId);
+      if (!target) {
+        setCopyState(button, 'failed', '請手動選取複製');
+        return;
+      }
+
+      const text = target.textContent.trim();
+      try {
+        if (!navigator.clipboard || !window.isSecureContext) {
+          throw new Error('clipboard-unavailable');
+        }
+        await navigator.clipboard.writeText(text);
+        setCopyState(button, 'copied', '已複製');
+      } catch (error) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        let copied = false;
+        try {
+          copied = document.execCommand('copy');
+        } catch (legacyError) {
+          copied = false;
+        }
+        textarea.remove();
+        setCopyState(button, copied ? 'copied' : 'failed', copied ? '已複製' : '請手動選取複製');
+      }
+    }
+
+    function setCopyState(button, state, label) {
+      const original = button.getAttribute('data-original-label') || button.textContent;
+      button.setAttribute('data-original-label', original);
+      button.setAttribute('data-state', state);
+      button.textContent = label;
+      window.setTimeout(() => {
+        button.removeAttribute('data-state');
+        button.textContent = original;
+      }, 1800);
+    }
+
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-copy-target]');
+      if (button) copyPrompt(button);
+    });
+  </script>
+</body>
+</html>
